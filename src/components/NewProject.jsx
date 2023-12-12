@@ -1,5 +1,9 @@
 import { forwardRef, useImperativeHandle, useRef } from "react";
 
+const inputClasses =
+  "px-2 py-1 bg-stone-200 text-lg border-b-2 border-stone-300 outline-none";
+const labelClasses = "font-bold uppercase text-stone-500 mt-5";
+
 const NewProject = forwardRef(function NewProject({ goBack }, ref) {
   const formData = useRef();
 
@@ -29,38 +33,18 @@ const NewProject = forwardRef(function NewProject({ goBack }, ref) {
         </button>
       </div>
       <form ref={formData} className="flex flex-col text-stone-600">
-        <label
-          htmlFor="title"
-          className="font-bold uppercase text-stone-500 mt-5"
-        >
+        <label htmlFor="title" className={labelClasses}>
           Title
         </label>
-        <input
-          id="title"
-          type="text"
-          className="px-2 py-1 bg-stone-200 text-lg border-b-2 border-stone-300 outline-none"
-        />
-        <label
-          htmlFor="description"
-          className="font-bold uppercase text-stone-500 mt-5"
-        >
+        <input id="title" type="text" className={inputClasses} />
+        <label htmlFor="description" className={labelClasses}>
           Description
         </label>
-        <textarea
-          id="description"
-          className="px-2 py-1 bg-stone-200 text-lg border-b-2 border-stone-300 outline-none"
-        ></textarea>
-        <label
-          htmlFor="date"
-          className="font-bold uppercase text-stone-500 mt-5"
-        >
+        <textarea id="description" className={inputClasses}></textarea>
+        <label htmlFor="date" className={labelClasses}>
           Due Date
         </label>
-        <input
-          id="date"
-          type="date"
-          className="px-2 py-1 bg-stone-200 text-lg border-b-2 border-stone-300 outline-none"
-        />
+        <input id="date" type="date" className={inputClasses} />
       </form>
     </div>
   );
