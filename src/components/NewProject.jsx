@@ -10,6 +10,7 @@ const NewProject = forwardRef(function NewProject({ goBack }, ref) {
           title: formData.current.title.value,
           description: formData.current.description.value,
           date: formData.current.date.value,
+          tasks: [],
         };
       },
     };
