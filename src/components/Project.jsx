@@ -1,11 +1,14 @@
 import { useRef, useState } from "react";
 
 export default function Project({
-  project,
+  projectsState,
   addTask,
   deleteProject,
   clearTask,
 }) {
+  const project = projectsState.projects.find(
+    (p) => p.id === projectsState.selectedProjectId
+  );
   const tasks = project.tasks;
   const taskRef = useRef();
   const noTasks = tasks.length <= 0;

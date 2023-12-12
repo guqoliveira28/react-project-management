@@ -4,48 +4,73 @@ import Sidebar from "./components/Sidebar";
 import NewProject from "./components/NewProject";
 import Project from "./components/Project";
 
-const projectsArray = [];
-
 function App() {
-  const [isCreatingProject, setIsCreatingProject] = useState(false);
-  const [projects, setProjects] = useState(projectsArray);
-  const [selectedProject, setSelectedProject] = useState();
+  const [projectsState, setProjectsState] = useState({
+    selectedProjectId: undefined,
+    projects: [],
+  });
   const newProject = useRef();
 
   function handleNewProject() {
-    setIsCreatingProject(true);
-    setSelectedProject(undefined);
+    setProjectsState((prevProjectsState) => {
+      return {
+        ...prevProjectsState,
+        selectedProjectId: null,
+      };
+    });
   }
 
   function handleCloseNewProject(save = false) {
     if (save) {
       const recievingProject = newProject.current.saveNewProject();
-      setProjects((prevProjects) => {
-        if (prevProjects.length > 0) {
-          recievingProject.id = prevProjects.slice(-1).pop().id + 1;
+      setProjectsState((prevProjectsState) => {
+        if (prevProjectsState.projects.length > 0) {
+          recievingProject.id =
+            prevProjectsState.projects.slice(-1).pop().id + 1;
         } else {
           recievingProject.id = 0;
         }
-        return [...prevProjects, recievingProject];
+        return {
+          ...prevProjectsState,
+          projects: [...prevProjectsState.projects, recievingProject],
+          selectedProjectId: undefined,
+        };
+      });
+    } else {
+      setProjectsState((prevProjectsState) => {
+        return {
+          ...prevProjectsState,
+          selectedProjectId: undefined,
+        };
       });
     }
-    setIsCreatingProject(false);
   }
 
   function handleSelectProject(projectId) {
-    const newSelectedProject = projects.find((p) => p.id === projectId);
-    setSelectedProject(newSelectedProject);
-    setIsCreatingProject(false);
+    setProjectsState((prevProjectsState) => {
+      return {
+        ...prevProjectsState,
+        selectedProjectId: projectId,
+      };
+    });
   }
 
   function handleDeleteProject() {
-    setProjects((prevProjects) => {
-      return prevProjects.filter((p) => p.id != selectedProject.id);
+    setProjectsState((prevProjectsState) => {
+      return {
+        ...prevProjectsState,
+        projects: prevProjectsState.projects.filter(
+          (p) => p.id != prevProjectsState.selectedProjectId
+        ),
+        selectedProjectId: undefined,
+      };
     });
-    setSelectedProject();
   }
 
   function handleAddTask(task) {
+    const selectedProject = projectsState.projects.find(
+      (p) => p.id === projectsState.selectedProjectId
+    );
     if (selectedProject.tasks.length > 0) {
       selectedProject.tasks.push({
         id: selectedProject.tasks.slice(-1).pop().id + 1,
@@ -54,57 +79,66 @@ function App() {
     } else {
       selectedProject.tasks.push({ id: 0, text: task });
     }
-    setProjects((prevProjects) => {
-      prevProjects[prevProjects.findIndex((p) => p.id === selectedProject.id)] =
-        selectedProject;
-      return [...prevProjects];
+    setProjectsState((prevProjectsState) => {
+      prevProjectsState.projects[
+        prevProjectsState.projects.findIndex((p) => p.id === selectedProject.id)
+      ] = selectedProject;
+      return {
+        ...prevProjectsState,
+        projects: [...prevProjectsState.projects],
+      };
     });
   }
 
   function handleDeleteTask(task) {
-    setProjects((prevProjects) => {
+    setProjectsState((prevProjectsState) => {
+      const selectedProject = projectsState.projects.find(
+        (p) => p.id === projectsState.selectedProjectId
+      );
       selectedProject.tasks = selectedProject.tasks.filter(
         (t) => t.id != task.id
       );
-      prevProjects[prevProjects.findIndex((p) => p.id === selectedProject.id)] =
-        selectedProject;
-      setSelectedProject({
-        ...selectedProject,
-        tasks: [...selectedProject.tasks],
-      });
-      return [
-        ...prevProjects.map((value) => {
-          return { ...value, tasks: [...value.tasks] };
-        }),
-      ];
+      prevProjectsState.projects[
+        prevProjectsState.projects.findIndex((p) => p.id === selectedProject.id)
+      ] = selectedProject;
+      return {
+        ...prevProjectsState,
+        projects: [...prevProjectsState.projects],
+      };
     });
+  }
+
+  let content;
+
+  if (projectsState.selectedProjectId === undefined) {
+    content = <Landing newProject={handleNewProject} />;
+  } else if (projectsState.selectedProjectId === null) {
+    content = (
+      <NewProject
+        goBack={(save) => handleCloseNewProject(save)}
+        ref={newProject}
+      />
+    );
+  } else {
+    content = (
+      <Project
+        projectsState={projectsState}
+        addTask={(task) => handleAddTask(task)}
+        deleteProject={handleDeleteProject}
+        clearTask={(task) => handleDeleteTask(task)}
+      />
+    );
   }
 
   return (
     <div className="h-full mt-10 flex">
       <Sidebar
-        projects={projects}
+        projects={projectsState.projects}
         newProject={handleNewProject}
         selectProject={(id) => handleSelectProject(id)}
-        active={selectedProject ? selectedProject.id : undefined}
+        active={projectsState.selectedProjectId ?? undefined}
       />
-      {!isCreatingProject & !selectedProject ? (
-        <Landing newProject={handleNewProject} />
-      ) : undefined}
-      {isCreatingProject && (
-        <NewProject
-          goBack={(save) => handleCloseNewProject(save)}
-          ref={newProject}
-        />
-      )}
-      {selectedProject && (
-        <Project
-          project={selectedProject}
-          addTask={(task) => handleAddTask(task)}
-          deleteProject={handleDeleteProject}
-          clearTask={(task) => handleDeleteTask(task)}
-        />
-      )}
+      {content}
     </div>
   );
 }
