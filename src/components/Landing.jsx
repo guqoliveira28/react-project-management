@@ -1,6 +1,6 @@
 import projectImage from "../assets/no-projects.png";
 
-export default function Landing() {
+export default function Landing({ newProject }) {
   return (
     <div className="flex flex-col text-center w-full mt-20">
       <img
@@ -14,7 +14,10 @@ export default function Landing() {
       <p className="text-stone-400 text-lg">
         Select a project or get started with a new one
       </p>
-      <button className="mt-10 px-5 py-2 bg-stone-900 w-fit mx-auto rounded-lg text-stone-400">
+      <button
+        className="mt-10 px-5 py-2 bg-stone-900 w-fit mx-auto rounded-lg text-stone-400"
+        onClick={newProject}
+      >
         Create new project
       </button>
     </div>
