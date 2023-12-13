@@ -9,6 +9,11 @@ export default function Project({
   const project = projectsState.projects.find(
     (p) => p.id === projectsState.selectedProjectId
   );
+  const date = new Date(project.date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
   const tasks = project.tasks;
   const taskRef = useRef();
   const noTasks = tasks.length <= 0;
@@ -30,7 +35,7 @@ export default function Project({
           Delete
         </button>
       </div>
-      <p className="py-4 text-stone-400">{project.date}</p>
+      <p className="py-4 text-stone-400">{date}</p>
       <p className="pb-4 text-lg">{project.description}</p>
       <div className="h-1 w-full bg-stone-300"></div>
       <h2 className="text-2xl font-bold my-4">Tasks</h2>

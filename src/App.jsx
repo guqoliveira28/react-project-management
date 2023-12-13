@@ -135,7 +135,7 @@ function App() {
       <Sidebar
         projects={projectsState.projects}
         newProject={handleNewProject}
-        selectProject={(id) => handleSelectProject(id)}
+        selectProject={handleSelectProject}
         active={projectsState.selectedProjectId ?? undefined}
       />
       {content}
